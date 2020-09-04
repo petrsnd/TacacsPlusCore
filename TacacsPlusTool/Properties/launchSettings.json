@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "TacacsPlusTool": {
+      "commandName": "Project",
+      "commandLineArgs": "-s 10.5.33.145 -S abcdefghijklmnopqrstuvwxyz123456 -t CHAP -u booger -p Test123"
+    }
+  }
+}
