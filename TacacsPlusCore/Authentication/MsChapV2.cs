@@ -12,11 +12,6 @@ namespace Petrsnd.TacacsPlusCore.Authentication
         private static readonly RandomNumberGenerator Rng = new RNGCryptoServiceProvider();
         private static readonly byte[] ClientPortName = Encoding.ASCII.GetBytes("net");
 
-        public static byte[] GetPasswordBuffer(SecureString password)
-        {
-            return Encoding.Unicode.GetBytes(password.ToInsecureString());
-        }
-
         public static byte[] GetAuthenticationData(TacacsAuthenticationService service, string user,
             SecureString password)
         {
@@ -39,9 +34,10 @@ namespace Petrsnd.TacacsPlusCore.Authentication
             Rng.GetBytes(authenticatorChallenge, 0, 16);
             Rng.GetBytes(peerChallenge, 0, 16);
 
+            // see RFC 2433
             var challengeResponse = new byte[49];
             // challenge -- 16 bytes
-            Buffer.BlockCopy(authenticatorChallenge, 0, challengeResponse, 0, 16);
+            Buffer.BlockCopy(peerChallenge, 0, challengeResponse, 0, 16);
             // reserved -- 8 bytes (zeroes)
             for (var i = 16; i < 24; i++)
                 Buffer.SetByte(challengeResponse, i, 0x00);
@@ -51,51 +47,40 @@ namespace Petrsnd.TacacsPlusCore.Authentication
             // flags -- 1 byte (zero)
             Buffer.SetByte(challengeResponse, 48, 0);
 
+            var identifier = new byte[1];
+            Rng.GetBytes(identifier, 0, 1);
+
+            // draft 18 -- 5.4.2.5
             var data = new byte[66];
-            Buffer.SetByte(data, 0, 0x0f); // PPP id (always 15?)
-            Buffer.BlockCopy(peerChallenge, 0, data, 1, 16);
+            Buffer.BlockCopy(identifier, 0, data, 0, 1);
+            Buffer.BlockCopy(authenticatorChallenge, 0, data, 1, 16);
             Buffer.BlockCopy(challengeResponse, 0, data, 17, 49);
 
-            var authenticationPacketLength =
+            // tacacs data
+            var authenticationDataLength =
                 8 /* header */ + userBuf.Length + ClientPortName.Length + 0 /* remote */ + 66 /* MsChapV2 length */;
-            var authenticationPacket = new byte[authenticationPacketLength];
+            var authenticationData = new byte[authenticationDataLength];
             var headerBuf = StructConverter.StructToBytes(authenticationHeader);
-            Buffer.BlockCopy(headerBuf, 0, authenticationPacket, 0, 8);
-            Buffer.BlockCopy(userBuf, 0, authenticationPacket, 8, userBuf.Length);
-            Buffer.BlockCopy(ClientPortName, 0, authenticationPacket, 8 + userBuf.Length, ClientPortName.Length);
-            Buffer.BlockCopy(data, 0, authenticationPacket, 8 + userBuf.Length + ClientPortName.Length, data.Length);
+            Buffer.BlockCopy(headerBuf, 0, authenticationData, 0, 8);
+            Buffer.BlockCopy(userBuf, 0, authenticationData, 8, userBuf.Length);
+            Buffer.BlockCopy(ClientPortName, 0, authenticationData, 8 + userBuf.Length, ClientPortName.Length);
+            Buffer.BlockCopy(data, 0, authenticationData, 8 + userBuf.Length + ClientPortName.Length, data.Length);
 
-            return authenticationPacket;
+            return authenticationData;
         }
 
         public static byte[] GetNtResponse(byte[] authenticatorChallenge, byte[] peerChallenge, byte[] userBuf,
             SecureString password)
         {
             var challengeHash = GetChallengeHash(authenticatorChallenge, peerChallenge, userBuf);
+            var input = new byte[24];
+            for (var i = 0; i < 3; i++)
+                Buffer.BlockCopy(challengeHash, 0, input, i * 8, 8);
             var passwordHash = GetNtPasswordHash(password);
-            var des = DES.Create();
-            des.Mode = CipherMode.ECB;
-            des.Padding = PaddingMode.None;
-            des.KeySize = 64;
-            des.Key = Convert7BitKey(passwordHash.Take(7).ToArray());
-            var ct = des.CreateEncryptor();
-            var pt1 = ct.TransformFinalBlock(challengeHash, 0, 8);
-
-            des.Key = Convert7BitKey(passwordHash.Skip(7).Take(7).ToArray());
-            ct = des.CreateEncryptor();
-            var pt2 = ct.TransformFinalBlock(challengeHash, 0, 8);
-
-            var finalKey = new byte[] { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 };
-            Buffer.BlockCopy(passwordHash, 14, finalKey, 0, 2);
-            des.Key = Convert7BitKey(finalKey);
-            ct = des.CreateEncryptor();
-            var pt3 = ct.TransformFinalBlock(challengeHash, 0, 8);
-
-            var response = new byte[24];
-            Buffer.BlockCopy(pt1, 0, response, 0, 8);
-            Buffer.BlockCopy(pt2, 0, response, 8, 8);
-            Buffer.BlockCopy(pt3, 0, response, 16, 8);
-            return response;
+            var key = new byte[21];
+            Buffer.BlockCopy(passwordHash, 0, key, 0, 16);
+            Buffer.BlockCopy(new byte[] { 0x00, 0x00, 0x00, 0x00, 0x00 }, 0, key, 16, 5);
+            return DesHash.ComputeHash(key, input);
         }
 
         public static byte[] GetChallengeHash(byte[] authenticatorChallenge, byte[] peerChallenge, byte[] userBuf)
@@ -114,24 +99,9 @@ namespace Petrsnd.TacacsPlusCore.Authentication
             return Md4.ComputeHash(GetPasswordBuffer(password));
         }
 
-        private static byte[] Convert7BitKey(byte[] inputKey)
+        public static byte[] GetPasswordBuffer(SecureString password)
         {
-            var outputKey = new byte[8];
-            outputKey[0] = (byte)(inputKey[0] >> 0x01);
-            outputKey[1] = (byte)(((inputKey[0] & 0x01) << 6) | (inputKey[1] >> 2));
-            outputKey[2] = (byte)(((inputKey[1] & 0x03) << 5) | (inputKey[2] >> 3));
-            outputKey[3] = (byte)(((inputKey[2] & 0x07) << 4) | (inputKey[3] >> 4));
-            outputKey[4] = (byte)(((inputKey[3] & 0x0F) << 3) | (inputKey[4] >> 5));
-            outputKey[5] = (byte)(((inputKey[4] & 0x1F) << 2) | (inputKey[5] >> 6));
-            outputKey[6] = (byte)(((inputKey[5] & 0x3F) << 1) | (inputKey[6] >> 7));
-            outputKey[7] = (byte)(inputKey[6] & 0x7F);
-
-            for (var i = 0; i < 8; i++)
-            {
-                outputKey[i] = (byte)((outputKey[i] << 1) & 0xfe);
-            }
-
-            return outputKey;
+            return Encoding.Unicode.GetBytes(password.ToInsecureString());
         }
     }
 }

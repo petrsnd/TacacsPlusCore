@@ -1,4 +1,5 @@
 ﻿using System.Linq;
+using System.Text;
 using Petrsnd.TacacsPlusCore.Utils;
 using Xunit;
 
@@ -31,6 +32,7 @@ namespace Petrsnd.TacacsPlusCore.Test
             var plainPayload = TacacsPlusProtocol.XorPseudoPad(payload, pseudoPad);
             var authenticationHeader = StructConverter.BytesToStruct<TacacsAuthenticationRequestHeader>(plainPayload);
 
+            // make sure we can read all the header values
             Assert.Equal(TacacsAuthenticationType.MsChapV2, authenticationHeader.AuthenticationType);
             Assert.Equal(TacacsAction.Login, authenticationHeader.Action);
             Assert.Equal(TacacsAuthenticationService.Login, authenticationHeader.Service);
@@ -38,16 +40,6 @@ namespace Petrsnd.TacacsPlusCore.Test
             Assert.Equal("net".Length, authenticationHeader.PortLength);
             Assert.Equal(0x00, authenticationHeader.RemoteLength);
             Assert.Equal(0x42, authenticationHeader.DataLength);
-
-            var payloadData = plainPayload
-                .Skip(8 + authenticationHeader.UserLength + authenticationHeader.PortLength +
-                      authenticationHeader.RemoteLength).Take(authenticationHeader.DataLength).ToArray();
-
-            Assert.Equal(0x0f, payloadData[0]); // ppp id
-
-            //var expectedData = 
-
-            //Assert.Equal(expectedData, payloadData);
         }
     }
 }

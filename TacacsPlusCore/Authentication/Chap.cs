@@ -40,16 +40,16 @@ namespace Petrsnd.TacacsPlusCore.Authentication
             Buffer.BlockCopy(challenge, 0, data, 1, 49);
             Buffer.BlockCopy(response, 0, data, 50, 16);
 
-            var authenticationPacketLength =
+            var authenticationDataLength =
                 8 /* header */ + userBuf.Length + ClientPortName.Length + 0 /* remote */ + 66 /* CHAP length */;
-            var authenticationPacket = new byte[authenticationPacketLength];
+            var authenticationData = new byte[authenticationDataLength];
             var headerBuf = StructConverter.StructToBytes(authenticationHeader);
-            Buffer.BlockCopy(headerBuf, 0, authenticationPacket, 0, 8);
-            Buffer.BlockCopy(userBuf, 0, authenticationPacket, 8, userBuf.Length);
-            Buffer.BlockCopy(ClientPortName, 0, authenticationPacket, 8 + userBuf.Length, ClientPortName.Length);
-            Buffer.BlockCopy(data, 0, authenticationPacket, 8 + userBuf.Length + ClientPortName.Length, data.Length);
+            Buffer.BlockCopy(headerBuf, 0, authenticationData, 0, 8);
+            Buffer.BlockCopy(userBuf, 0, authenticationData, 8, userBuf.Length);
+            Buffer.BlockCopy(ClientPortName, 0, authenticationData, 8 + userBuf.Length, ClientPortName.Length);
+            Buffer.BlockCopy(data, 0, authenticationData, 8 + userBuf.Length + ClientPortName.Length, data.Length);
 
-            return authenticationPacket;
+            return authenticationData;
         }
 
         public static byte[] GetResponse(byte[] identifier, byte[] challenge, SecureString password)

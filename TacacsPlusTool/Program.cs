@@ -20,6 +20,10 @@ namespace Petrsnd.TacacsPlusCore.Tool
                     case "CHAP":
                         type = TacacsAuthenticationType.Chap;
                         break;
+                    case "MSCHAP":
+                    case "MSCHAPV1":
+                        type = TacacsAuthenticationType.MsChap;
+                        break;
                     case "MSCHAPV2":
                         type = TacacsAuthenticationType.MsChapV2;
                         break;
