@@ -11,7 +11,8 @@ namespace Petrsnd.TacacsPlusCore.Authentication
         private static readonly RandomNumberGenerator Rng = new RNGCryptoServiceProvider();
         private static readonly byte[] ClientPortName = Encoding.ASCII.GetBytes("chap");
 
-        public static byte[] GetAuthenticationData(string user, SecureString password)
+        public static byte[] GetAuthenticationData(TacacsAuthenticationService service, string user,
+            SecureString password)
         {
             var userBuf = user.GetUserBuffer();
 
@@ -20,9 +21,9 @@ namespace Petrsnd.TacacsPlusCore.Authentication
                 Action = TacacsAction.Login,
                 PrivilegeLevel = 0x01,
                 AuthenticationType = TacacsAuthenticationType.Chap,
-                Service = TacacsAuthenticationService.Login,
-                UserLength = ((byte)userBuf.Length),
-                PortLength = ((byte)ClientPortName.Length),
+                Service = service,
+                UserLength = ((byte) userBuf.Length),
+                PortLength = ((byte) ClientPortName.Length),
                 RemoteLength = 0x00, // optional -- excluded
                 DataLength = 0x42 // 66 bytes -- big challenge
             };

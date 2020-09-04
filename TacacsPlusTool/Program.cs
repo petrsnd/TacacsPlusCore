@@ -14,6 +14,7 @@ namespace Petrsnd.TacacsPlusCore.Tool
                 var client = new TacacsPlusClient(opts.Server, 49, opts.SharedSecret.ToSecureString());
 
                 TacacsAuthenticationType type;
+                TacacsAuthenticationService service;
                 switch (opts.AuthType.ToUpper())
                 {
                     case "CHAP":
@@ -25,7 +26,23 @@ namespace Petrsnd.TacacsPlusCore.Tool
                     default:
                         throw new Exception($"Unrecognized authentication type {opts.AuthType}");
                 }
-                client.Authenticate(type, opts.Username, opts.Password.ToSecureString());
+
+                switch (opts.Service.ToUpper())
+                {
+                    case "None":
+                        service = TacacsAuthenticationService.None;
+                        break;
+                    case "Login":
+                        service = TacacsAuthenticationService.Login;
+                        break;
+                    case "Enable":
+                        service = TacacsAuthenticationService.Enable;
+                        break;
+                    default:
+                        throw new Exception($"Unrecognized authentication service {opts.AuthType}");
+                }
+
+                client.Authenticate(type, service, opts.Username, opts.Password.ToSecureString());
 
             }
             catch (Exception ex)

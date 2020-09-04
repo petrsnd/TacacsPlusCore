@@ -11,8 +11,9 @@ namespace Petrsnd.TacacsPlusCore
     public static class TacacsPlusProtocol
     {
         private static readonly RandomNumberGenerator Rng = new RNGCryptoServiceProvider();
-        
-        public static byte[] GetAuthenticationPacket(TacacsAuthenticationType type, string user, SecureString password,
+
+        public static byte[] GetAuthenticationPacket(TacacsAuthenticationType type, TacacsAuthenticationService service,
+            string user, SecureString password,
             SecureString sharedSecret)
         {
             byte[] intBuf = {0x00, 0x00, 0x00, 0x00};
@@ -41,10 +42,10 @@ namespace Petrsnd.TacacsPlusCore
                 case TacacsAuthenticationType.MsChap:
                     throw new NotSupportedException("MS-CHAP authentication method not supported");
                 case TacacsAuthenticationType.Chap:
-                    authenticationData = Chap.GetAuthenticationData(user, password);
+                    authenticationData = Chap.GetAuthenticationData(service, user, password);
                     break;
                 case TacacsAuthenticationType.MsChapV2:
-                    authenticationData = MsChapV2.GetAuthenticationData(user, password);
+                    authenticationData = MsChapV2.GetAuthenticationData(service, user, password);
                     break;
                 default:
                     throw new ArgumentOutOfRangeException(nameof(type), type, null);

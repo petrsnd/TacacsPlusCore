@@ -42,19 +42,21 @@ namespace Petrsnd.TacacsPlusCore
             }
         }
 
-        public bool Authenticate(TacacsAuthenticationType type, string user, SecureString password)
+        public bool Authenticate(TacacsAuthenticationType type, TacacsAuthenticationService service, string user,
+            SecureString password)
         {
             if (string.IsNullOrEmpty(user))
                 throw new ArgumentException("Must specify a valid user name", nameof(user));
             if (password == null)
                 throw new ArgumentException("Must specify a valid password", nameof(password));
 
-            var requestPacket = TacacsPlusProtocol.GetAuthenticationPacket(type, user, password, _sharedSecret);
+            var requestPacket = TacacsPlusProtocol.GetAuthenticationPacket(type, service, user, password, _sharedSecret);
             var responsePacket = SendReceive(requestPacket);
 
             var responsePayload = ValidateResponseAndGetPayload(responsePacket);
 
-            var authenticationReplyHeader = StructConverter.BytesToStruct<TacacsAuthenticationReplyHeader>(responsePayload);
+            var authenticationReplyHeader =
+                StructConverter.BytesToStruct<TacacsAuthenticationReplyHeader>(responsePayload);
             switch (authenticationReplyHeader.Status)
             {
                 case TacacsAuthenticationStatus.Pass:

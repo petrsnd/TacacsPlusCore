@@ -17,7 +17,8 @@ namespace Petrsnd.TacacsPlusCore.Authentication
             return Encoding.Unicode.GetBytes(password.ToInsecureString());
         }
 
-        public static byte[] GetAuthenticationData(string user, SecureString password)
+        public static byte[] GetAuthenticationData(TacacsAuthenticationService service, string user,
+            SecureString password)
         {
             var userBuf = user.GetUserBuffer();
 
@@ -26,9 +27,9 @@ namespace Petrsnd.TacacsPlusCore.Authentication
                 Action = TacacsAction.Login,
                 PrivilegeLevel = 0x01,
                 AuthenticationType = TacacsAuthenticationType.MsChapV2,
-                Service = TacacsAuthenticationService.Login,
-                UserLength = ((byte)userBuf.Length),
-                PortLength = ((byte)ClientPortName.Length),
+                Service = service,
+                UserLength = ((byte) userBuf.Length),
+                PortLength = ((byte) ClientPortName.Length),
                 RemoteLength = 0x00, // optional -- excluded
                 DataLength = 0x42 // 66 bytes
             };
@@ -45,7 +46,7 @@ namespace Petrsnd.TacacsPlusCore.Authentication
             for (var i = 16; i < 24; i++)
                 Buffer.SetByte(challengeResponse, i, 0x00);
             // NT-response -- 24 bytes
-            var ntResponse = MsChapV2.GetNtResponse(authenticatorChallenge, peerChallenge, userBuf, password);
+            var ntResponse = GetNtResponse(authenticatorChallenge, peerChallenge, userBuf, password);
             Buffer.BlockCopy(ntResponse, 0, challengeResponse, 24, 24);
             // flags -- 1 byte (zero)
             Buffer.SetByte(challengeResponse, 48, 0);

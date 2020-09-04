@@ -13,7 +13,8 @@ namespace Petrsnd.TacacsPlusCore.Test
             var user = "booger";
             var password = "Test123".ToSecureString();
 
-            var packet = TacacsPlusProtocol.GetAuthenticationPacket(TacacsAuthenticationType.MsChapV2, user, password, sharedSecret);
+            var packet = TacacsPlusProtocol.GetAuthenticationPacket(TacacsAuthenticationType.MsChapV2,
+                TacacsAuthenticationService.Login, user, password, sharedSecret);
 
             var header = StructConverter.BytesToStruct<TacacsHeader>(packet);
             Assert.Equal(0xc1, header.Version);

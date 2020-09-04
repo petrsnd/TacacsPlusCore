@@ -1,4 +1,5 @@
 ﻿using CommandLine;
+using CommandLine.Text;
 
 namespace Petrsnd.TacacsPlusCore.Tool
 {
@@ -11,6 +12,10 @@ namespace Petrsnd.TacacsPlusCore.Tool
         [Option('S', "SharedSecret", Required = true,
             HelpText = "TACACS+ shared secret")]
         public string SharedSecret { get; set; }
+
+        [Option('v', "Service", Required = false, Default = "None",
+            HelpText = "TACACS+ service (None, Login, Enable)")]
+        public string Service { get; set; }
 
         [Option('u', "Username", Required = true, SetName = "PasswordSet",
             HelpText = "TACACS+ username to use to authenticate")]
