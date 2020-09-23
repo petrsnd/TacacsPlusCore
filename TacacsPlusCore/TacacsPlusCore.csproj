@@ -3,6 +3,32 @@
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
     <RootNamespace>Petrsnd.TacacsPlusCore</RootNamespace>
+    <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
+    <Version>9999.9999.9999</Version>
+    <AssemblyVersion>9999.9999.9999.9999</AssemblyVersion>
+    <FileVersion>9999.9999.9999.9999</FileVersion>
+    <Authors>petrsnd@gmail.com</Authors>
+    <Company>petrsnd</Company>
+    <Copyright>(c) 2020 Daniel F. Peterson &lt;petrsnd@gmail.com&gt;</Copyright>
+    <PackageLicenseFile>LICENSE</PackageLicenseFile>
+    <Description>Simple .NET TACACS+ client library</Description>
+    <PackageProjectUrl>https://github.com/petrsnd/TacacsPlusCore</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/petrsnd/TacacsPlusCore</RepositoryUrl>
+    <PackageTags>cisco;tacacs-plus;csharp;netstandard;dotnet-standard</PackageTags>
+    <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
+    <RepositoryType>git</RepositoryType>
+    <IncludeSymbols>true</IncludeSymbols>
+    <SymbolPackageFormat>snupkg</SymbolPackageFormat>
+    <PackageReleaseNotes>Currently only supports Authentication requests. Support could be added for Authorization and Accounting.
+
+Algorithms are implemented for CHAP, MS-CHAPv1, and MS-CHAPv2. CHAP has been tested against Cisco ISE and is working.</PackageReleaseNotes>
   </PropertyGroup>
+
+  <ItemGroup>
+    <None Include="..\LICENSE">
+      <Pack>True</Pack>
+      <PackagePath></PackagePath>
+    </None>
+  </ItemGroup>
 
 </Project>
