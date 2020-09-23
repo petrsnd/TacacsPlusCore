@@ -1,3 +1,8 @@
+[![Build status](https://img.shields.io/appveyor/build/petrsnd/TacacsPlusCore)](https://ci.appveyor.com/project/petrsnd/tacacspluscore)
+[![nuget](https://img.shields.io/nuget/vpre/TacacsPlusCore)](https://www.nuget.org/packages/TacacsPlusCore)
+[![License](https://img.shields.io/github/license/petrsnd/TacacsPlusCore)](https://github.com/petrnsd/TacacsPlusCore/blob/master/LICENSE)
+
+
 # TacacsPlusCore
 Simple .NET TACACS+ client library
 
