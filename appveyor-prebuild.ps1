@@ -10,7 +10,7 @@ if (Test-Path .\artifacts)
 
 Write-Host "prebuild: Setting version numbers"
 # TacacsPlusCore
-$ProjectFile = (Join-Path $PSScriptRoot "SafeguardDotNet\SafeguardDotNet.csproj")
+$ProjectFile = (Join-Path $PSScriptRoot "TacacsPlusCore\TacacsPlusCore.csproj")
 
 $PackageCodeMarker = "9999.9999.9999"
 $AssemblyCodeMarker = "9999.9999.9999.9999"
