@@ -68,6 +68,11 @@ namespace Petrsnd.TacacsPlusCore
                         Encoding.UTF8.GetString(responsePacket.Skip(6 /* Authentication Reply Header Size */)
                             .Take(authenticationReplyHeader.ServerMessageLength).ToArray());
                     throw new Exception($"Server responded with an error: {serverMessage}");
+                case TacacsAuthenticationStatus.GetData:
+                case TacacsAuthenticationStatus.GetUser:
+                case TacacsAuthenticationStatus.GetPassword:
+                case TacacsAuthenticationStatus.Restart:
+                case TacacsAuthenticationStatus.Follow:
                 default:
                     throw new Exception($"Unexpected authentication status: {authenticationReplyHeader.Status}");
             }

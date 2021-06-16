@@ -5,6 +5,7 @@ namespace Petrsnd.TacacsPlusCore
 {
     public enum TacacsType : byte
     {
+        StartTls = 0x00,
         Authentication = 0x01,
         Authorization = 0x02,
         Accounting = 0x03
