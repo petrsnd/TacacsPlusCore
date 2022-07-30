@@ -3,7 +3,7 @@
 [![License](https://img.shields.io/github/license/petrsnd/TacacsPlusCore)](https://github.com/petrnsd/TacacsPlusCore/blob/master/LICENSE)
 
 
-# TacacsPlusCore
+# <img src="TACACS+.png" width="28" height="28" />  TacacsPlusCore
 Simple .NET TACACS+ client library
 
 Currently only supports Authentication requests.  Support could be added for Authorization and Accounting.
