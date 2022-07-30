@@ -14,6 +14,7 @@
     <Description>Simple .NET TACACS+ client library</Description>
     <PackageProjectUrl>https://github.com/petrsnd/TacacsPlusCore</PackageProjectUrl>
     <RepositoryUrl>https://github.com/petrsnd/TacacsPlusCore</RepositoryUrl>
+    <PackageIcon>Content\images\TACACS+.png</PackageIcon>
     <PackageTags>cisco;tacacs-plus;csharp;netstandard;dotnet-standard</PackageTags>
     <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
     <RepositoryType>git</RepositoryType>
@@ -23,6 +24,10 @@
 
 Algorithms are implemented for CHAP, MS-CHAPv1, and MS-CHAPv2. CHAP has been tested against Cisco ISE and is working.</PackageReleaseNotes>
   </PropertyGroup>
+
+  <ItemGroup>
+    <None Include="..\TACACS+.png" Link="TACACS+.png" Pack="true" PackagePath="Content\images\" />
+  </ItemGroup>
 
   <ItemGroup>
     <None Include="..\LICENSE">

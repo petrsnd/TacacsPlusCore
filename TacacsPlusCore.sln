@@ -3,11 +3,19 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
 VisualStudioVersion = 16.0.30114.105
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TacacsPlusCore", "TacacsPlusCore\TacacsPlusCore.csproj", "{5AF6A551-6EA7-43AF-A231-7A541E8F19B9}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TacacsPlusCore", "TacacsPlusCore\TacacsPlusCore.csproj", "{5AF6A551-6EA7-43AF-A231-7A541E8F19B9}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TacacsPlusCoreTest", "TacacsPlusCoreTest\TacacsPlusCoreTest.csproj", "{0C5E705F-995D-49AA-A20B-0B4445851588}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TacacsPlusCoreTest", "TacacsPlusCoreTest\TacacsPlusCoreTest.csproj", "{0C5E705F-995D-49AA-A20B-0B4445851588}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TacacsPlusTool", "TacacsPlusTool\TacacsPlusTool.csproj", "{E7ED6848-F8E7-4B52-818B-CC9E919DE559}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TacacsPlusTool", "TacacsPlusTool\TacacsPlusTool.csproj", "{E7ED6848-F8E7-4B52-818B-CC9E919DE559}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{C1BB3942-B48C-41BB-BA45-94156F561E40}"
+	ProjectSection(SolutionItems) = preProject
+		appveyor-prebuild.ps1 = appveyor-prebuild.ps1
+		appveyor.yml = appveyor.yml
+		README.md = README.md
+		TACACS+.png = TACACS+.png
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
