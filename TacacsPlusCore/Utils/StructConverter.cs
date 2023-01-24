@@ -23,7 +23,7 @@ namespace Petrsnd.TacacsPlusCore.Utils
 
         public static T BytesToStruct<T>(byte[] bytes) where T : struct
         {
-            var structure = new T();
+            var structure = default(T);
             var size = Marshal.SizeOf(typeof(T));
             var ptr = Marshal.AllocHGlobal(size);
 

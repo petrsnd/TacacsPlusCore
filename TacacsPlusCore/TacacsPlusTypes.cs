@@ -89,7 +89,7 @@ namespace Petrsnd.TacacsPlusCore
         public TacacsAuthenticationService Service;
         public byte UserLength;
         public byte PortLength;
-        public byte RemoteLength; 
+        public byte RemoteLength;
         public byte DataLength;
     }
 
