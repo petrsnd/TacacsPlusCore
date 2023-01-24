@@ -83,7 +83,7 @@ namespace Petrsnd.TacacsPlusCore
                 client.ReceiveTimeout = _timeout;
                 var startTime = DateTime.Now;
 
-                client.Send(requestPacket);
+                _ = client.Send(requestPacket);
                 var responseData = new byte[2048];
                 var responseSize = 0;
                 while (responseSize <= 0)

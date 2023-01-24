@@ -10,13 +10,13 @@ namespace Petrsnd.TacacsPlusCore
 {
     public static class TacacsPlusProtocol
     {
-        private static readonly RandomNumberGenerator Rng = new RNGCryptoServiceProvider();
+        private static readonly RandomNumberGenerator Rng = RandomNumberGenerator.Create();
 
         public static byte[] GetAuthenticationPacket(TacacsAuthenticationType type, TacacsAuthenticationService service,
             string user, SecureString password,
             SecureString sharedSecret)
         {
-            byte[] intBuf = {0x00, 0x00, 0x00, 0x00};
+            byte[] intBuf = { 0x00, 0x00, 0x00, 0x00 };
             Rng.GetBytes(intBuf, 0, 4);
             var sessionId = BitConverter.ToInt32(intBuf, 0);
 
@@ -99,7 +99,7 @@ namespace Petrsnd.TacacsPlusCore
                     var sharedSecretBytes = Encoding.UTF8.GetBytes(sharedSecretPlain);
 
                     md5.AppendData(sharedSecretBytes);
-                    md5.AppendData(new[] {header.Version, header.SequenceNumber});
+                    md5.AppendData(new[] { header.Version, header.SequenceNumber });
                     var preI = i - 1;
                     if (preI >= 0)
                         md5.AppendData(pseudoPad, preI * 16, 16);
