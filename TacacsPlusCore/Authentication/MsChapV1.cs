@@ -9,7 +9,7 @@ namespace Petrsnd.TacacsPlusCore.Authentication
 {
     public static class MsChapV1
     {
-        private static readonly RandomNumberGenerator Rng = new RNGCryptoServiceProvider();
+        private static readonly RandomNumberGenerator Rng = RandomNumberGenerator.Create();
         private static readonly byte[] ClientPortName = Encoding.ASCII.GetBytes("net");
 
         public static byte[] GetAuthenticationData(TacacsAuthenticationService service, string user,
@@ -23,8 +23,8 @@ namespace Petrsnd.TacacsPlusCore.Authentication
                 PrivilegeLevel = 0x01,
                 AuthenticationType = TacacsAuthenticationType.MsChap,
                 Service = service,
-                UserLength = ((byte) userBuf.Length),
-                PortLength = ((byte) ClientPortName.Length),
+                UserLength = (byte)userBuf.Length,
+                PortLength = (byte)ClientPortName.Length,
                 RemoteLength = 0x00, // optional -- excluded
                 DataLength = 0x42 // 66 bytes
             };
@@ -39,7 +39,7 @@ namespace Petrsnd.TacacsPlusCore.Authentication
             var challengeResponse = new byte[49];
             Buffer.BlockCopy(lmChallengeResponse, 0, challengeResponse, 0, 24);
             Buffer.BlockCopy(ntChallengeResponse, 0, challengeResponse, 24, 24);
-            Buffer.BlockCopy(new byte[] {0x01}, 0, challengeResponse, 48, 1);
+            Buffer.BlockCopy(new byte[] { 0x01 }, 0, challengeResponse, 48, 1);
 
             // ppp id
             var identifier = new byte[1];

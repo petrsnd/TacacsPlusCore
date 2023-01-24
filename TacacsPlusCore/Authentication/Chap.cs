@@ -8,7 +8,7 @@ namespace Petrsnd.TacacsPlusCore.Authentication
 {
     public static class Chap
     {
-        private static readonly RandomNumberGenerator Rng = new RNGCryptoServiceProvider();
+        private static readonly RandomNumberGenerator Rng = RandomNumberGenerator.Create();
         private static readonly byte[] ClientPortName = Encoding.ASCII.GetBytes("chap");
 
         public static byte[] GetAuthenticationData(TacacsAuthenticationService service, string user,
@@ -22,16 +22,16 @@ namespace Petrsnd.TacacsPlusCore.Authentication
                 PrivilegeLevel = 0x01,
                 AuthenticationType = TacacsAuthenticationType.Chap,
                 Service = service,
-                UserLength = ((byte) userBuf.Length),
-                PortLength = ((byte) ClientPortName.Length),
+                UserLength = (byte)userBuf.Length,
+                PortLength = (byte)ClientPortName.Length,
                 RemoteLength = 0x00, // optional -- excluded
                 DataLength = 0x42 // 66 bytes -- big challenge
             };
 
             var identifier = new byte[1];
             Rng.GetBytes(identifier, 0, 1);
-            //var challenge = new byte[49];
-            //Rng.GetBytes(challenge, 0, 32);
+            // var challenge = new byte[49];
+            // Rng.GetBytes(challenge, 0, 32);
             var challenge = Encoding.ASCII.GetBytes("1234567890123456789012345678901234567890123456789");
 
             var response = GetResponse(identifier, challenge, password);

@@ -9,7 +9,7 @@ namespace Petrsnd.TacacsPlusCore.Authentication
 {
     public static class MsChapV2
     {
-        private static readonly RandomNumberGenerator Rng = new RNGCryptoServiceProvider();
+        private static readonly RandomNumberGenerator Rng = RandomNumberGenerator.Create();
         private static readonly byte[] ClientPortName = Encoding.ASCII.GetBytes("net");
 
         public static byte[] GetAuthenticationData(TacacsAuthenticationService service, string user,
@@ -23,8 +23,8 @@ namespace Petrsnd.TacacsPlusCore.Authentication
                 PrivilegeLevel = 0x01,
                 AuthenticationType = TacacsAuthenticationType.MsChapV2,
                 Service = service,
-                UserLength = ((byte) userBuf.Length),
-                PortLength = ((byte) ClientPortName.Length),
+                UserLength = (byte)userBuf.Length,
+                PortLength = (byte)ClientPortName.Length,
                 RemoteLength = 0x00, // optional -- excluded
                 DataLength = 0x42 // 66 bytes
             };
