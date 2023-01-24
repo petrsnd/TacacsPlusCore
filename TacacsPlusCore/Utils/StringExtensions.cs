@@ -23,7 +23,7 @@ namespace Petrsnd.TacacsPlusCore.Utils
             return new NetworkCredential(string.Empty, thisSecureString).Password;
         }
 
-        internal static byte[] GetUserBuffer(this string user)
+        public static byte[] GetUserBuffer(this string user)
         {
             // I'm not sure if this is right...but probably works in most cases
             return Encoding.UTF8.GetBytes(user);
