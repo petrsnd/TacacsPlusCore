@@ -2,6 +2,9 @@ version: 0.9.0-dev-{build}
 branches:
   only:
   - master
+skip_commits:
+  files:
+    - README.md
 image: Visual Studio 2019
 configuration: Release
 before_build:
