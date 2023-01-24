@@ -1,7 +1,8 @@
-version: 0.9.0-dev-{build}
+version: 1.0.0-release-{build}
 branches:
   only:
   - master
+  - release-1.0
 skip_commits:
   files:
     - README.md
