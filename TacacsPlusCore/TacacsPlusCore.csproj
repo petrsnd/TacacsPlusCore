@@ -9,7 +9,7 @@
     <FileVersion>9999.9999.9999.9999</FileVersion>
     <Authors>petrsnd@gmail.com</Authors>
     <Company>petrsnd</Company>
-    <Copyright>(c) 2023 Daniel F. Peterson &lt;petrsnd@gmail.com&gt;</Copyright>
+    <Copyright>© 2023 Daniel F. Peterson &lt;petrsnd@gmail.com&gt;</Copyright>
     <PackageLicenseFile>LICENSE</PackageLicenseFile>
     <Description>Simple .NET TACACS+ client library</Description>
     <PackageProjectUrl>https://github.com/petrsnd/TacacsPlusCore</PackageProjectUrl>
