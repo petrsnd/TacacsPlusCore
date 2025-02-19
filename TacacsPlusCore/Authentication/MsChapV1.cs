@@ -53,7 +53,7 @@ namespace Petrsnd.TacacsPlusCore.Authentication
 
             // tacacs data
             var authenticationDataLength =
-                8 /* header */ + userBuf.Length + ClientPortName.Length + 0 /* remote */ + 66 /* MsChapV2 length */;
+                8 /* header */ + userBuf.Length + ClientPortName.Length + 0 /* remote */ + 66 /* MsChapV1 length */;
             var authenticationData = new byte[authenticationDataLength];
             var headerBuf = StructConverter.StructToBytes(authenticationHeader);
             Buffer.BlockCopy(headerBuf, 0, authenticationData, 0, 8);

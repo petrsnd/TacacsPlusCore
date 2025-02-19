@@ -40,7 +40,8 @@ namespace Petrsnd.TacacsPlusCore
                 case TacacsAuthenticationType.Arap:
                     throw new NotSupportedException("ARAP authentication method not supported");
                 case TacacsAuthenticationType.MsChap:
-                    throw new NotSupportedException("MS-CHAP authentication method not supported");
+                    authenticationData = MsChapV1.GetAuthenticationData(service, user, password);
+                    break;
                 case TacacsAuthenticationType.Chap:
                     authenticationData = Chap.GetAuthenticationData(service, user, password);
                     break;
