@@ -65,7 +65,7 @@ namespace Petrsnd.TacacsPlusCore
                     return false;
                 case TacacsAuthenticationStatus.Error:
                     var serverMessage =
-                        Encoding.UTF8.GetString(responsePacket.Skip(6 /* Authentication Reply Header Size */)
+                        Encoding.UTF8.GetString(responsePayload.Skip(6 /* Authentication Reply Header Size */)
                             .Take(authenticationReplyHeader.ServerMessageLength).ToArray());
                     throw new Exception($"Server responded with an error: {serverMessage}");
                 default:
