@@ -2,7 +2,7 @@
   "profiles": {
     "TacacsPlusTool": {
       "commandName": "Project",
-      "commandLineArgs": "-s 10.5.33.145 -S abcdefghijklmnopqrstuvwxyz123456 -t CHAP -u booger -p Test123"
+      "commandLineArgs": "-s 127.0.0.1 -S abcdefghijklmnopqrstuvwxyz1234567890 -t MSCHAPv2 -u chapuser -p Chap123!"
     }
   }
 }
