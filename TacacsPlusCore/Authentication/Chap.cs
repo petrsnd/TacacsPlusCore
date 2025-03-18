@@ -30,9 +30,8 @@ namespace Petrsnd.TacacsPlusCore.Authentication
 
             var identifier = new byte[1];
             Rng.GetBytes(identifier, 0, 1);
-            // var challenge = new byte[49];
-            // Rng.GetBytes(challenge, 0, 32);
-            var challenge = Encoding.ASCII.GetBytes("1234567890123456789012345678901234567890123456789");
+            var challenge = new byte[49];
+            Rng.GetBytes(challenge, 0, 49);
 
             var response = GetResponse(identifier, challenge, password);
             var data = new byte[1 /* identifier */ + 49 /* challenge */ + 16 /* response */];
