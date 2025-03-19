@@ -11,7 +11,7 @@ namespace Petrsnd.TacacsPlusCore.Tool
         {
             try
             {
-                var client = new TacacsPlusClient(opts.Server, 49, opts.SharedSecret.ToSecureString());
+                var client = new TacacsPlusClient(opts.Server, 49, opts.SharedSecret.ToSecureString(), opts.Timeout);
 
                 TacacsAuthenticationType type;
                 TacacsAuthenticationService service;

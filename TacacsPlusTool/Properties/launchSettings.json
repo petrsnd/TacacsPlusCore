@@ -2,7 +2,7 @@
   "profiles": {
     "TacacsPlusTool": {
       "commandName": "Project",
-      "commandLineArgs": "-s 127.0.0.1 -S abcdefghijklmnopqrstuvwxyz1234567890 -t MSCHAPv2 -u chapuser -p Chap123!"
+      "commandLineArgs": "-s 127.0.0.1 -S abcdefghijklmnopqrstuvwxyz1234567890 -t MSCHAP -u chapuser -p Chap123!"
     }
   }
 }
