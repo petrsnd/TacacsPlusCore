@@ -46,7 +46,7 @@ namespace Petrsnd.TacacsPlusCore
             SecureString password)
         {
             if (string.IsNullOrEmpty(user))
-                throw new ArgumentException("Must specify a valid user name", nameof(user));
+                throw new ArgumentException("Must specify a valid username", nameof(user));
             if (password == null)
                 throw new ArgumentException("Must specify a valid password", nameof(password));
 
@@ -104,6 +104,7 @@ namespace Petrsnd.TacacsPlusCore
 
         private byte[] ValidateResponseAndGetPayload(byte[] responsePacket)
         {
+            // Confirm required header values (RFC 8907)
             var responseHeader = StructConverter.BytesToStruct<TacacsHeader>(responsePacket);
             if (responseHeader.Version != 0xc1)
                 throw new Exception($"Unexpected response header version: 0x{responseHeader.Version:X}");
@@ -116,6 +117,7 @@ namespace Petrsnd.TacacsPlusCore
 
         private byte[] GetResponsePayload(TacacsHeader responseHeader, byte[] responsePacket)
         {
+            // De-obfuscate the packet as described in RFC 8907
             var responsePayload = responsePacket.Skip(responsePacket.Length - responseHeader.Length).ToArray();
             var pseudoPad = TacacsPlusProtocol.GetPseudoPad(responseHeader, responseHeader.Length, _sharedSecret);
             return TacacsPlusProtocol.XorPseudoPad(responsePayload, pseudoPad);
