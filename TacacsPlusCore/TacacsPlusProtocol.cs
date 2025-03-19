@@ -16,6 +16,7 @@ namespace Petrsnd.TacacsPlusCore
             string user, SecureString password,
             SecureString sharedSecret)
         {
+            // Random session ID
             byte[] intBuf = { 0x00, 0x00, 0x00, 0x00 };
             Rng.GetBytes(intBuf, 0, 4);
             var sessionId = BitConverter.ToInt32(intBuf, 0);
@@ -24,10 +25,10 @@ namespace Petrsnd.TacacsPlusCore
             {
                 Version = TacacsHeaderExtensions.VersionOne,
                 Type = TacacsType.Authentication,
-                SequenceNumber = 0x01,
-                Flags = TacacsFlags.Encrypted,
-                SessionId = sessionId,
-                Length = 0
+                SequenceNumber = 0x01, // we only support single request/response auth methods right now
+                Flags = TacacsFlags.Encrypted, // always "encrypted" per RFC 8907
+                SessionId = sessionId, // session ID is random
+                Length = 0 // length is set later
             };
 
             byte[] authenticationData;
@@ -40,7 +41,8 @@ namespace Petrsnd.TacacsPlusCore
                 case TacacsAuthenticationType.Arap:
                     throw new NotSupportedException("ARAP authentication method not supported");
                 case TacacsAuthenticationType.MsChap:
-                    throw new NotSupportedException("MS-CHAP authentication method not supported");
+                    authenticationData = MsChapV1.GetAuthenticationData(service, user, password);
+                    break;
                 case TacacsAuthenticationType.Chap:
                     authenticationData = Chap.GetAuthenticationData(service, user, password);
                     break;
@@ -56,6 +58,7 @@ namespace Petrsnd.TacacsPlusCore
 
         public static byte[] CreatePacket(TacacsHeader header, byte[] data, SecureString sharedSecret)
         {
+            // See RFC 8907 - prepare the packet header (4.1) and prepare and obfuscate the body (4.2 - 4.5)
             header.Length = data.Length;
             var packetLength = 12 /* tacacs header len */ + data.Length;
             var packet = new byte[packetLength];
@@ -74,6 +77,7 @@ namespace Petrsnd.TacacsPlusCore
 
         public static byte[] XorPseudoPad(byte[] data, byte[] pseudoPad)
         {
+            // See RFC 8907 - 4.5, simple XOR obfuscation
             var obfuscated = new byte[data.Length];
             for (var i = 0; i < pseudoPad.Length; i++)
                 obfuscated[i] = (byte)(data[i] ^ pseudoPad[i]);
@@ -82,6 +86,7 @@ namespace Petrsnd.TacacsPlusCore
 
         public static byte[] GetPseudoPad(TacacsHeader header, int dataLength, SecureString sharedSecret)
         {
+            // See RFC 8907 - 4.5 for pseudo pad calculation
             var iterations = (dataLength / 16) + 1;
             var length = iterations * 16;
             var pseudoPad = new byte[length];
