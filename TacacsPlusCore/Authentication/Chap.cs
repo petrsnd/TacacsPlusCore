@@ -25,7 +25,7 @@ namespace Petrsnd.TacacsPlusCore.Authentication
                 UserLength = (byte)userBuf.Length,
                 PortLength = (byte)ClientPortName.Length,
                 RemoteLength = 0x00, // optional -- excluded
-                DataLength = 0x42 // 66 bytes -- big challenge
+                DataLength = 0x42 // 66 bytes -- identifier (1 byte) + big challenge (49 bytes) + response (16 bytes)
             };
 
             var identifier = new byte[1];
@@ -40,7 +40,7 @@ namespace Petrsnd.TacacsPlusCore.Authentication
             Buffer.BlockCopy(response, 0, data, 50, 16);
 
             var authenticationDataLength =
-                8 /* header */ + userBuf.Length + ClientPortName.Length + 0 /* remote */ + 66 /* CHAP length */;
+                8 /* header */ + userBuf.Length + ClientPortName.Length + 0 /* remote */ + 66 /* CHAP data length */;
             var authenticationData = new byte[authenticationDataLength];
             var headerBuf = StructConverter.StructToBytes(authenticationHeader);
             Buffer.BlockCopy(headerBuf, 0, authenticationData, 0, 8);
@@ -56,8 +56,8 @@ namespace Petrsnd.TacacsPlusCore.Authentication
             using (var md5 = IncrementalHash.CreateHash(HashAlgorithmName.MD5))
             {
                 md5.AppendData(identifier);
-                var sharedSecretBytes = Encoding.UTF8.GetBytes(password.ToInsecureString());
-                md5.AppendData(sharedSecretBytes);
+                var passwordBytes = Encoding.UTF8.GetBytes(password.ToInsecureString());
+                md5.AppendData(passwordBytes);
                 md5.AppendData(challenge);
                 return md5.GetHashAndReset();
             }
