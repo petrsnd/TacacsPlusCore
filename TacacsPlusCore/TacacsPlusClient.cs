@@ -75,6 +75,7 @@ namespace Petrsnd.TacacsPlusCore
 
         private byte[] SendReceive(byte[] requestPacket)
         {
+            const int MAX_PACKET_SIZE = 65536;
             using (var client = new Socket(_serverIpEndPoint.AddressFamily, SocketType.Stream, ProtocolType.Tcp))
             {
                 client.Connect(_serverIpEndPoint);
@@ -84,7 +85,7 @@ namespace Petrsnd.TacacsPlusCore
                 var startTime = DateTime.Now;
 
                 _ = client.Send(requestPacket);
-                var responseData = new byte[2048];
+                var responseData = new byte[MAX_PACKET_SIZE];
                 var responseSize = 0;
                 while (responseSize <= 0)
                 {
