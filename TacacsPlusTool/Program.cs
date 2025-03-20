@@ -11,7 +11,7 @@ namespace Petrsnd.TacacsPlusCore.Tool
         {
             try
             {
-                var client = new TacacsPlusClient(opts.Server, 49, opts.SharedSecret.ToSecureString());
+                var client = new TacacsPlusClient(opts.Server, 49, opts.SharedSecret.ToSecureString(), opts.Timeout);
 
                 TacacsAuthenticationType type;
                 TacacsAuthenticationService service;
@@ -33,21 +33,27 @@ namespace Petrsnd.TacacsPlusCore.Tool
 
                 switch (opts.Service.ToUpper())
                 {
-                    case "None":
+                    case "NONE":
                         service = TacacsAuthenticationService.None;
                         break;
-                    case "Login":
+                    case "LOGIN":
                         service = TacacsAuthenticationService.Login;
                         break;
-                    case "Enable":
+                    case "ENABLE":
                         service = TacacsAuthenticationService.Enable;
                         break;
                     default:
-                        throw new Exception($"Unrecognized authentication service {opts.AuthType}");
+                        throw new Exception($"Unrecognized authentication service {opts.Service}");
                 }
 
-                client.Authenticate(type, service, opts.Username, opts.Password.ToSecureString());
-
+                if (client.Authenticate(type, service, opts.Username, opts.Password.ToSecureString()))
+                {
+                    Console.WriteLine("Authentication SUCCESS!");
+                }
+                else
+                {
+                    Console.WriteLine("Authentication FAILED!");
+                }
             }
             catch (Exception ex)
             {

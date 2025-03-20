@@ -46,7 +46,7 @@ namespace Petrsnd.TacacsPlusCore
             SecureString password)
         {
             if (string.IsNullOrEmpty(user))
-                throw new ArgumentException("Must specify a valid user name", nameof(user));
+                throw new ArgumentException("Must specify a valid username", nameof(user));
             if (password == null)
                 throw new ArgumentException("Must specify a valid password", nameof(password));
 
@@ -57,6 +57,21 @@ namespace Petrsnd.TacacsPlusCore
 
             var authenticationReplyHeader =
                 StructConverter.BytesToStruct<TacacsAuthenticationReplyHeader>(responsePayload);
+
+            string serverMessage = null;
+            if (authenticationReplyHeader.ServerMessageLength > 0)
+            {
+                serverMessage = Encoding.UTF8.GetString(responsePayload.Skip(6 /* Authentication reply header size */)
+                    .Take(authenticationReplyHeader.ServerMessageLength).ToArray());
+            }
+
+            byte[] data = {};
+            if (authenticationReplyHeader.DataLength > 0)
+            {
+                data = responsePayload.Skip(6 /* Authentication reply header size */ + authenticationReplyHeader.ServerMessageLength)
+                    .Take(authenticationReplyHeader.DataLength).ToArray();
+            }
+
             switch (authenticationReplyHeader.Status)
             {
                 case TacacsAuthenticationStatus.Pass:
@@ -64,10 +79,18 @@ namespace Petrsnd.TacacsPlusCore
                 case TacacsAuthenticationStatus.Fail:
                     return false;
                 case TacacsAuthenticationStatus.Error:
-                    var serverMessage =
-                        Encoding.UTF8.GetString(responsePacket.Skip(6 /* Authentication Reply Header Size */)
-                            .Take(authenticationReplyHeader.ServerMessageLength).ToArray());
-                    throw new Exception($"Server responded with an error: {serverMessage}");
+                    if (serverMessage == null)
+                    {
+                        serverMessage = "<null>";
+                    }
+
+                    var message = $"Server responded with an error: {serverMessage}";
+                    if (data.Length > 0)
+                    {
+                        message += Environment.NewLine + $"Data: {BitConverter.ToString(data).Replace("-", " ")}";
+                    }
+
+                    throw new Exception(message);
                 default:
                     throw new Exception($"Unexpected authentication status: {authenticationReplyHeader.Status}");
             }
@@ -75,6 +98,7 @@ namespace Petrsnd.TacacsPlusCore
 
         private byte[] SendReceive(byte[] requestPacket)
         {
+            const int MAX_PACKET_SIZE = 65536;
             using (var client = new Socket(_serverIpEndPoint.AddressFamily, SocketType.Stream, ProtocolType.Tcp))
             {
                 client.Connect(_serverIpEndPoint);
@@ -84,7 +108,7 @@ namespace Petrsnd.TacacsPlusCore
                 var startTime = DateTime.Now;
 
                 _ = client.Send(requestPacket);
-                var responseData = new byte[2048];
+                var responseData = new byte[MAX_PACKET_SIZE];
                 var responseSize = 0;
                 while (responseSize <= 0)
                 {
@@ -103,6 +127,7 @@ namespace Petrsnd.TacacsPlusCore
 
         private byte[] ValidateResponseAndGetPayload(byte[] responsePacket)
         {
+            // Confirm required header values (RFC 8907)
             var responseHeader = StructConverter.BytesToStruct<TacacsHeader>(responsePacket);
             if (responseHeader.Version != 0xc1)
                 throw new Exception($"Unexpected response header version: 0x{responseHeader.Version:X}");
@@ -115,6 +140,7 @@ namespace Petrsnd.TacacsPlusCore
 
         private byte[] GetResponsePayload(TacacsHeader responseHeader, byte[] responsePacket)
         {
+            // De-obfuscate the packet as described in RFC 8907
             var responsePayload = responsePacket.Skip(responsePacket.Length - responseHeader.Length).ToArray();
             var pseudoPad = TacacsPlusProtocol.GetPseudoPad(responseHeader, responseHeader.Length, _sharedSecret);
             return TacacsPlusProtocol.XorPseudoPad(responsePayload, pseudoPad);

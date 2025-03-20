@@ -25,23 +25,27 @@ namespace Petrsnd.TacacsPlusCore.Authentication
                 UserLength = (byte)userBuf.Length,
                 PortLength = (byte)ClientPortName.Length,
                 RemoteLength = 0x00, // optional -- excluded
-                DataLength = 0x42 // 66 bytes -- big challenge
+                DataLength = 0x42 // 66 bytes -- identifier (1 byte) + big challenge (49 bytes) + response (16 bytes)
             };
 
+            // ppp ID (random per RFC 1994 4.1)
             var identifier = new byte[1];
             Rng.GetBytes(identifier, 0, 1);
-            // var challenge = new byte[49];
-            // Rng.GetBytes(challenge, 0, 32);
-            var challenge = Encoding.ASCII.GetBytes("1234567890123456789012345678901234567890123456789");
 
+            // Arbitrary-sized, random challenge (49 bytes)
+            var challenge = new byte[49];
+            Rng.GetBytes(challenge, 0, 49);
+
+            // Response is always 16 byte MD5 digest hash
             var response = GetResponse(identifier, challenge, password);
+            // RFC 8907 5.4.2.3 -- data = identifier, challenge, response
             var data = new byte[1 /* identifier */ + 49 /* challenge */ + 16 /* response */];
             Buffer.BlockCopy(identifier, 0, data, 0, 1);
             Buffer.BlockCopy(challenge, 0, data, 1, 49);
             Buffer.BlockCopy(response, 0, data, 50, 16);
 
             var authenticationDataLength =
-                8 /* header */ + userBuf.Length + ClientPortName.Length + 0 /* remote */ + 66 /* CHAP length */;
+                8 /* header */ + userBuf.Length + ClientPortName.Length + 0 /* remote */ + 66 /* CHAP data length */;
             var authenticationData = new byte[authenticationDataLength];
             var headerBuf = StructConverter.StructToBytes(authenticationHeader);
             Buffer.BlockCopy(headerBuf, 0, authenticationData, 0, 8);
@@ -54,11 +58,12 @@ namespace Petrsnd.TacacsPlusCore.Authentication
 
         public static byte[] GetResponse(byte[] identifier, byte[] challenge, SecureString password)
         {
+            // RFC 1994 4.1 -- MD5(ppp id, password, challenge)
             using (var md5 = IncrementalHash.CreateHash(HashAlgorithmName.MD5))
             {
                 md5.AppendData(identifier);
-                var sharedSecretBytes = Encoding.UTF8.GetBytes(password.ToInsecureString());
-                md5.AppendData(sharedSecretBytes);
+                var passwordBytes = Encoding.UTF8.GetBytes(password.ToInsecureString());
+                md5.AppendData(passwordBytes);
                 md5.AppendData(challenge);
                 return md5.GetHashAndReset();
             }

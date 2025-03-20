@@ -7,10 +7,10 @@ namespace Petrsnd.TacacsPlusCore.Test
 {
     public class TestMsChapV1
     {
+        // test vectors from RFC 2433 -- B.2
         private readonly byte[] _challenge = {0x10, 0x2D, 0xB5, 0xDF, 0x08, 0x5D, 0x30, 0x41};
         private readonly SecureString _password = "MyPw".ToSecureString();
 
-        // test vectors from RFC 2433 -- B.2
         [Fact]
         public void TestGetNtPasswordBuffer()
         {
@@ -41,5 +41,6 @@ namespace Petrsnd.TacacsPlusCore.Test
         }
 
         // unfortunately, there are no test vectors for the LAN MAN functions :(
+        // but those are deprecated anyway in RFC 2433
     }
 }

@@ -26,34 +26,39 @@ namespace Petrsnd.TacacsPlusCore.Authentication
                 UserLength = (byte)userBuf.Length,
                 PortLength = (byte)ClientPortName.Length,
                 RemoteLength = 0x00, // optional -- excluded
-                DataLength = 0x42 // 66 bytes
+                DataLength = 0x3A // 58 bytes
             };
 
+            // Challenge must be 8 bytes (see RFC 8907 5.4.2.4 and RFC 2433)
             var challenge = new byte[8];
             Rng.GetBytes(challenge, 0, 8);
 
+            // RFC 2433 6 states that the LAN MAnager compatible challenge has been deprecated
+            // and should not be sent.  Instead this should be zero-filled.
             var lmChallengeResponse = GetLmChallengeResponse(challenge, password);
+            Buffer.BlockCopy(Enumerable.Repeat((byte)0x00, 24).ToArray(), 0, lmChallengeResponse, 0, 24);
+            // RFC 2433 6, also see A.5
             var ntChallengeResponse = GetNtChallengeResponse(challenge, password);
 
             // MS-CHAPv1 response (49 bytes) -- see RFC 2433
             var challengeResponse = new byte[49];
             Buffer.BlockCopy(lmChallengeResponse, 0, challengeResponse, 0, 24);
             Buffer.BlockCopy(ntChallengeResponse, 0, challengeResponse, 24, 24);
-            Buffer.BlockCopy(new byte[] { 0x01 }, 0, challengeResponse, 48, 1);
+            Buffer.BlockCopy(new byte[] { 0x01 }, 0, challengeResponse, 48, 1); // always set to 0x01 to use NT compatible challenge
 
             // ppp id
             var identifier = new byte[1];
             Rng.GetBytes(identifier, 0, 1);
 
-            // draft 18 -- 5.4.2.4
-            var data = new byte[66];
+            // RFC 8907 5.4.2.4 -- data = ppp id, challenge, response
+            var data = new byte[58];  // ppp id (1 byte) + challenge (8 bytes) + response (49 bytes)
             Buffer.BlockCopy(identifier, 0, data, 0, 1);
-            Buffer.BlockCopy(challenge, 0, data, 1, 16);
-            Buffer.BlockCopy(challengeResponse, 0, data, 17, 49);
+            Buffer.BlockCopy(challenge, 0, data, 1, 8);
+            Buffer.BlockCopy(challengeResponse, 0, data, 9, 49);
 
             // tacacs data
             var authenticationDataLength =
-                8 /* header */ + userBuf.Length + ClientPortName.Length + 0 /* remote */ + 66 /* MsChapV2 length */;
+                8 /* header */ + userBuf.Length + ClientPortName.Length + 0 /* remote */ + 58 /* MsChap length */;
             var authenticationData = new byte[authenticationDataLength];
             var headerBuf = StructConverter.StructToBytes(authenticationHeader);
             Buffer.BlockCopy(headerBuf, 0, authenticationData, 0, 8);

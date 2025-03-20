@@ -61,7 +61,7 @@ namespace Petrsnd.TacacsPlusCore
         Ascii = 0x01,
         Pap = 0x02,
         Chap = 0x03,
-        Arap = 0x04, // Legacy (see 2020 ietf draft)
+        Arap = 0x04, // Legacy (see RFC 8907)
         MsChap = 0x05,
         MsChapV2 = 0x06
     }
@@ -71,13 +71,13 @@ namespace Petrsnd.TacacsPlusCore
         None = 0x00,
         Login = 0x01,
         Enable = 0x02,
-        Ppp = 0x03, // Legacy (see 2020 ietf draft)
-        Arap = 0x04, // Legacy (see 2020 ietf draft)
-        Pt = 0x05, // Legacy (see 2020 ietf draft)
-        Rcmd = 0x06, // Legacy (see 2020 ietf draft)
-        X25 = 0x07, // Legacy (see 2020 ietf draft)
-        Nasi = 0x08, // Legacy (see 2020 ietf draft)
-        FwProxy = 0x09 // Legacy (see 2020 ietf draft)
+        Ppp = 0x03, // Legacy (see RFC 8907)
+        Arap = 0x04, // Legacy (see RFC 8907)
+        Pt = 0x05, // Legacy (see RFC 8907)
+        Rcmd = 0x06, // Legacy (see RFC 8907)
+        X25 = 0x07, // Legacy (see RFC 8907)
+        Nasi = 0x08, // Legacy (see RFC 8907)
+        FwProxy = 0x09 // Legacy (see RFC 8907)
     }
 
     [StructLayout(LayoutKind.Sequential, Pack = 1)]

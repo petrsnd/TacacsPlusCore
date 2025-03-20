@@ -25,8 +25,10 @@ namespace Petrsnd.TacacsPlusCore.Utils
 
         public static byte[] GetUserBuffer(this string user)
         {
-            // I'm not sure if this is right...but probably works in most cases
+            // This probably works in most cases
             return Encoding.UTF8.GetBytes(user);
+            // TODO: Support for RFC 8265 -- 
+            //       Preparation, Enforcement, and Comparison of Internationalized Strings Representing Usernames and Passwords
         }
     }
 }
