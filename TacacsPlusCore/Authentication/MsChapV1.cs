@@ -50,7 +50,7 @@ namespace Petrsnd.TacacsPlusCore.Authentication
             var identifier = new byte[1];
             Rng.GetBytes(identifier, 0, 1);
 
-            // RFC 2433
+            // RFC 8907 5.4.2.4 -- data = ppp id, challenge, response
             var data = new byte[58];  // ppp id (1 byte) + challenge (8 bytes) + response (49 bytes)
             Buffer.BlockCopy(identifier, 0, data, 0, 1);
             Buffer.BlockCopy(challenge, 0, data, 1, 8);

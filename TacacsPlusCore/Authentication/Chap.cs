@@ -28,12 +28,17 @@ namespace Petrsnd.TacacsPlusCore.Authentication
                 DataLength = 0x42 // 66 bytes -- identifier (1 byte) + big challenge (49 bytes) + response (16 bytes)
             };
 
+            // ppp ID (random per RFC 1994 4.1)
             var identifier = new byte[1];
             Rng.GetBytes(identifier, 0, 1);
+
+            // Arbitrary-sized, random challenge (49 bytes)
             var challenge = new byte[49];
             Rng.GetBytes(challenge, 0, 49);
 
+            // Response is always 16 byte MD5 digest hash
             var response = GetResponse(identifier, challenge, password);
+            // RFC 8907 5.4.2.3 -- data = identifier, challenge, response
             var data = new byte[1 /* identifier */ + 49 /* challenge */ + 16 /* response */];
             Buffer.BlockCopy(identifier, 0, data, 0, 1);
             Buffer.BlockCopy(challenge, 0, data, 1, 49);
@@ -53,6 +58,7 @@ namespace Petrsnd.TacacsPlusCore.Authentication
 
         public static byte[] GetResponse(byte[] identifier, byte[] challenge, SecureString password)
         {
+            // RFC 1994 4.1 -- MD5(ppp id, password, challenge)
             using (var md5 = IncrementalHash.CreateHash(HashAlgorithmName.MD5))
             {
                 md5.AppendData(identifier);

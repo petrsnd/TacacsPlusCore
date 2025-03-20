@@ -16,7 +16,7 @@ namespace Petrsnd.TacacsPlusCore
             string user, SecureString password,
             SecureString sharedSecret)
         {
-            // Random session ID
+            // Random session ID per RFC 8907 4.1
             byte[] intBuf = { 0x00, 0x00, 0x00, 0x00 };
             Rng.GetBytes(intBuf, 0, 4);
             var sessionId = BitConverter.ToInt32(intBuf, 0);
@@ -40,11 +40,11 @@ namespace Petrsnd.TacacsPlusCore
                     throw new NotSupportedException("PAP authentication method not supported");
                 case TacacsAuthenticationType.Arap:
                     throw new NotSupportedException("ARAP authentication method not supported");
-                case TacacsAuthenticationType.MsChap:
-                    authenticationData = MsChapV1.GetAuthenticationData(service, user, password);
-                    break;
                 case TacacsAuthenticationType.Chap:
                     authenticationData = Chap.GetAuthenticationData(service, user, password);
+                    break;
+                case TacacsAuthenticationType.MsChap:
+                    authenticationData = MsChapV1.GetAuthenticationData(service, user, password);
                     break;
                 case TacacsAuthenticationType.MsChapV2:
                     authenticationData = MsChapV2.GetAuthenticationData(service, user, password);
