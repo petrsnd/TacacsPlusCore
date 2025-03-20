@@ -22,10 +22,7 @@
     <IncludeSymbols>true</IncludeSymbols>
     <SymbolPackageFormat>snupkg</SymbolPackageFormat>
     <PackageReleaseNotes>
-- Fixed MS-CHAPv1 and tested it against Cisco ISE
-- Fixed issues with the test tool in the repository
-- Improved error handling
-- Corrected issues related to randomized challenge in CHAP
+- Minor bug fixes
     </PackageReleaseNotes>
   </PropertyGroup>
 
