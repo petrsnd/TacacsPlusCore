@@ -1,7 +1,8 @@
-version: 1.1.0-dev-{build}
+version: 1.1.0-release-{build}
 branches:
   only:
   - master
+  - release-1.1
 skip_commits:
   files:
     - README.md
@@ -19,7 +20,7 @@ build:
 deploy:
 - provider: NuGet
   api_key:
-    secure: hCf3CYxDjjUdIeMlGv38eURitGnfsq5AvhEUOTPTATxqzROOjBbHm/mkRyvfocYD
+    secure: Sz7kT1QLRqAyGmL+IiJdhRm0aDu7vmaZcyVnP6AJ2cu//4EOrPm6BaRxFZrvz7ex 
 notifications:
 - provider: Email
   to:
