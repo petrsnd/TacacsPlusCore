@@ -26,7 +26,7 @@ namespace Petrsnd.TacacsPlusCore.Tool
         public string Password { get; set; }
 
         [Option('t', "AuthType", Required = true, Default = false,
-            HelpText = "TACACS+ authentication protocol (CHAP, MSCHAPv2)")]
+            HelpText = "TACACS+ authentication protocol (CHAP, MSCHAPv1, MSCHAPv2)")]
         public string AuthType { get; set; }
 
         [Option('T', "Timeout", Required = false, Default = 3000,
