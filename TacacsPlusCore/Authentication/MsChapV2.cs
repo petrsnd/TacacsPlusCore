@@ -63,7 +63,7 @@ namespace Petrsnd.TacacsPlusCore.Authentication
 
             // tacacs data
             var authenticationDataLength =
-                8 /* header */ + userBuf.Length + ClientPortName.Length + 0 /* remote */ + 66 /* MsChapV2 length */;
+                8 /* header */ + userBuf.Length + ClientPortName.Length + 0 /* remote */ + data.Length /* MsChapV2 length */;
             var authenticationData = new byte[authenticationDataLength];
             var headerBuf = StructConverter.StructToBytes(authenticationHeader);
             Buffer.BlockCopy(headerBuf, 0, authenticationData, 0, 8);
@@ -102,6 +102,57 @@ namespace Petrsnd.TacacsPlusCore.Authentication
         public static byte[] GetNtPasswordHash(SecureString password)
         {
             return Md4.ComputeHash(GetPasswordBuffer(password));
+        }
+
+        public static byte[] HashNtPasswordHash(byte[] passwordHash)
+        {
+            return Md4.ComputeHash(passwordHash);
+        }
+
+        public static string GenerateAuthenticatorResponse(SecureString password, byte[] ntResponse,
+            byte[] peerChallenge, byte[] authenticatorChallenge, byte[] userBuf)
+        {
+            var magic1 = new byte[]
+            {
+                0x4D, 0x61, 0x67, 0x69, 0x63, 0x20, 0x73, 0x65, 0x72, 0x76,
+                0x65, 0x72, 0x20, 0x74, 0x6F, 0x20, 0x63, 0x6C, 0x69, 0x65,
+                0x6E, 0x74, 0x20, 0x73, 0x69, 0x67, 0x6E, 0x69, 0x6E, 0x67,
+                0x20, 0x63, 0x6F, 0x6E, 0x73, 0x74, 0x61, 0x6E, 0x74
+            };
+
+            var magic2 = new byte[]
+            {
+                0x50, 0x61, 0x64, 0x20, 0x74, 0x6F, 0x20, 0x6D, 0x61, 0x6B,
+                0x65, 0x20, 0x69, 0x74, 0x20, 0x64, 0x6F, 0x20, 0x6D, 0x6F,
+                0x72, 0x65, 0x20, 0x74, 0x68, 0x61, 0x6E, 0x20, 0x6F, 0x6E,
+                0x65, 0x20, 0x69, 0x74, 0x65, 0x72, 0x61, 0x74, 0x69, 0x6F,
+                0x6E
+            };
+
+            var passwordHash = GetNtPasswordHash(password);
+            var passwordHashHash = HashNtPasswordHash(passwordHash);
+
+            byte[] digest1;
+            using (var sha = IncrementalHash.CreateHash(HashAlgorithmName.SHA1))
+            {
+                sha.AppendData(passwordHashHash);
+                sha.AppendData(ntResponse);
+                sha.AppendData(magic1);
+                digest1 = sha.GetHashAndReset();
+            }
+
+            var challengeHash = GetChallengeHash(authenticatorChallenge, peerChallenge, userBuf);
+
+            byte[] digest2;
+            using (var sha = IncrementalHash.CreateHash(HashAlgorithmName.SHA1))
+            {
+                sha.AppendData(digest1);
+                sha.AppendData(challengeHash);
+                sha.AppendData(magic2);
+                digest2 = sha.GetHashAndReset();
+            }
+
+            return $"S={BitConverter.ToString(digest2).Replace("-", string.Empty)}";
         }
 
         public static byte[] GetPasswordBuffer(SecureString password)
