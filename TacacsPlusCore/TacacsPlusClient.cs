@@ -57,6 +57,21 @@ namespace Petrsnd.TacacsPlusCore
 
             var authenticationReplyHeader =
                 StructConverter.BytesToStruct<TacacsAuthenticationReplyHeader>(responsePayload);
+
+            string serverMessage = null;
+            if (authenticationReplyHeader.ServerMessageLength > 0)
+            {
+                serverMessage = Encoding.UTF8.GetString(responsePayload.Skip(6 /* Authentication reply header size */)
+                    .Take(authenticationReplyHeader.ServerMessageLength).ToArray());
+            }
+
+            byte[] data = {};
+            if (authenticationReplyHeader.DataLength > 0)
+            {
+                data = responsePayload.Skip(6 /* Authentication reply header size */ + authenticationReplyHeader.ServerMessageLength)
+                    .Take(authenticationReplyHeader.DataLength).ToArray();
+            }
+
             switch (authenticationReplyHeader.Status)
             {
                 case TacacsAuthenticationStatus.Pass:
@@ -64,10 +79,18 @@ namespace Petrsnd.TacacsPlusCore
                 case TacacsAuthenticationStatus.Fail:
                     return false;
                 case TacacsAuthenticationStatus.Error:
-                    var serverMessage =
-                        Encoding.UTF8.GetString(responsePayload.Skip(6 /* Authentication Reply Header Size */)
-                            .Take(authenticationReplyHeader.ServerMessageLength).ToArray());
-                    throw new Exception($"Server responded with an error: {serverMessage}");
+                    if (serverMessage == null)
+                    {
+                        serverMessage = "<null>";
+                    }
+
+                    var message = $"Server responded with an error: {serverMessage}";
+                    if (data.Length > 0)
+                    {
+                        message += Environment.NewLine + $"Data: {BitConverter.ToString(data).Replace("-", " ")}";
+                    }
+
+                    throw new Exception(message);
                 default:
                     throw new Exception($"Unexpected authentication status: {authenticationReplyHeader.Status}");
             }
