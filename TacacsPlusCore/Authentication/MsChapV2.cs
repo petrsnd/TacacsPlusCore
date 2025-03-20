@@ -77,6 +77,8 @@ namespace Petrsnd.TacacsPlusCore.Authentication
         public static byte[] GetNtResponse(byte[] authenticatorChallenge, byte[] peerChallenge, byte[] userBuf,
             SecureString password)
         {
+            ValidateChallenges(authenticatorChallenge, peerChallenge);
+
             var challengeHash = GetChallengeHash(authenticatorChallenge, peerChallenge, userBuf);
             var input = new byte[24];
             for (var i = 0; i < 3; i++)
@@ -90,6 +92,8 @@ namespace Petrsnd.TacacsPlusCore.Authentication
 
         public static byte[] GetChallengeHash(byte[] authenticatorChallenge, byte[] peerChallenge, byte[] userBuf)
         {
+            ValidateChallenges(authenticatorChallenge, peerChallenge);
+
             using (var sha = IncrementalHash.CreateHash(HashAlgorithmName.SHA1))
             {
                 sha.AppendData(peerChallenge);
@@ -112,6 +116,8 @@ namespace Petrsnd.TacacsPlusCore.Authentication
         public static string GenerateAuthenticatorResponse(SecureString password, byte[] ntResponse,
             byte[] peerChallenge, byte[] authenticatorChallenge, byte[] userBuf)
         {
+            ValidateChallenges(authenticatorChallenge, peerChallenge);
+
             var magic1 = new byte[]
             {
                 0x4D, 0x61, 0x67, 0x69, 0x63, 0x20, 0x73, 0x65, 0x72, 0x76,
@@ -158,6 +164,19 @@ namespace Petrsnd.TacacsPlusCore.Authentication
         public static byte[] GetPasswordBuffer(SecureString password)
         {
             return Encoding.Unicode.GetBytes(password.ToInsecureString());
+        }
+
+        private static void ValidateChallenges(byte[] authenticatorChallenge, byte[] peerChallenge)
+        {
+            if (authenticatorChallenge.Length != 16)
+            {
+                throw new ArgumentException("Authenticator challenge must be 16 bytes");
+            }
+
+            if (peerChallenge.Length != 16)
+            {
+                throw new ArgumentException("Peer challenge must be 16 bytes");
+            }
         }
     }
 }
