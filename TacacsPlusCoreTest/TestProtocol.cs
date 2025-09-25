@@ -20,7 +20,7 @@ namespace Petrsnd.TacacsPlusCore.Test
             var header = StructConverter.BytesToStruct<TacacsHeader>(packet);
             Assert.Equal(0xc1, header.Version);
             Assert.Equal(TacacsFlags.Encrypted, header.Flags);
-            Assert.Equal(0x63, header.Length);
+            Assert.Equal(0x53, header.Length);
             Assert.Equal(0x01, header.SequenceNumber);
             Assert.Equal(TacacsType.Authentication, header.Type);
             // Can't validate session number, because it is random
