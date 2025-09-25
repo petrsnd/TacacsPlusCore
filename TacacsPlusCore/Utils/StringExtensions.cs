@@ -10,7 +10,7 @@ namespace Petrsnd.TacacsPlusCore.Utils
     {
         public static SecureString ToSecureString(this string thisString)
         {
-            if (string.IsNullOrWhiteSpace(thisString))
+            if (thisString == null)
                 return null;
             var result = new SecureString();
             foreach (var c in thisString)
