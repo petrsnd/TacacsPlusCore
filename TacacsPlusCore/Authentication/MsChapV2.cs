@@ -55,11 +55,10 @@ namespace Petrsnd.TacacsPlusCore.Authentication
             Rng.GetBytes(identifier, 0, 1);
 
             // RFC 8907 5.4.2.5 -- data = ppp id, challenge, challenge response
-            var data = new byte[82];
+            var data = new byte[66];
             Buffer.BlockCopy(identifier, 0, data, 0, 1);
-            Buffer.BlockCopy(authenticatorChallenge, 0, data, 1, 16); // <----- This is where RFC 8907 5.4.2.5 is unclear...
-            Buffer.BlockCopy(peerChallenge, 0, data, 17, 16);         // <-----/   it says MS-CHAP challenge, followed by MS-CHAP response
-            Buffer.BlockCopy(challengeResponse, 0, data, 33, 49);     //           it ought to mention MS-CHAPv2 has two challenges
+            Buffer.BlockCopy(authenticatorChallenge, 0, data, 1, 16);
+            Buffer.BlockCopy(challengeResponse, 0, data, 17, 49); // The peerChallenge is already included in the challengeResponse above
 
             // tacacs data
             var authenticationDataLength =
