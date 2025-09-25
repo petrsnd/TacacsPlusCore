@@ -9,9 +9,9 @@ Simple .NET TACACS+ client library
 Currently only supports Authentication requests.  Support could be added for Authorization and Accounting.
 
 Algorithms are implemented for CHAP, MS-CHAPv1, and MS-CHAPv2:
-- CHAP has been tested against Cisco ISE and TACACS.net
+- CHAP has been tested against Cisco ISE and [TACACS.net](https://tacacs.net/)
 - MS-CHAPv1 has been tested against Cisco ISE
-- MS-CHAPv2 In RFC 8907, it is not clear how the "received" challenge and peer challenge are sent in the request, and CISCO ISE does not allow MS-CHAPv2
+- MS-CHAPv2 has been tested against [tac_plus-ng](https://github.com/MarcJHuber/event-driven-servers)
 
 Calling the API to Authenticate is super simple.
 
